@@ -1,4 +1,4 @@
-# Mening ilk nodejs telegram botim
+Mening ilk nodejs telegram botim
 
 <a href="https://t.me/sbk_game_bot" target="_blank">@sbk_game_bot</a>
 <br>
