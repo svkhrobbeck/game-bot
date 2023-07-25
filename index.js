@@ -1,9 +1,16 @@
+const TelegramBot = require("node-telegram-bot-api");
 require("dotenv").config();
 
-const TelegramBot = require("node-telegram-bot-api");
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
-const chats = {};
+let randomNum;
+
+// options
+const startOptions = {
+  reply_markup: JSON.stringify({
+    inline_keyboard: [[{ text: "O'yin o'ynash", callback_data: "/game" }]],
+  }),
+};
 
 const gameOptions = {
   reply_markup: JSON.stringify({
@@ -28,49 +35,43 @@ const gameOptions = {
   }),
 };
 
-const againOptions = {
-  reply_markup: JSON.stringify({ inline_keyboard: [[{ text: "Qayta boshlash", callback_data: "/again" }]] }),
+const restartOptions = {
+  reply_markup: JSON.stringify({ inline_keyboard: [[{ text: "Qayta o'ynash", callback_data: "/again" }]] }),
 };
 
-bot.setMyCommands([
-  {
-    command: "/start",
-    description: "Botni ishga tushirish",
-  },
-  {
-    command: "/info",
-    description: "Bot haqida ma'lumot",
-  },
-  {
-    command: "/game",
-    description: "O'yin o'ynash",
-  },
-]);
-
+// functions
 const startGame = async chatId => {
   await bot.sendMessage(chatId, "0 dan 9 gacha bo'lgan sonlardan birini tanlang", gameOptions);
-  const randomNum = Math.trunc(Math.random() * 10);
-  chats.chatId = randomNum;
+  const random = Math.trunc(Math.random() * 10);
+  randomNum = random;
 };
 
-const start = () => {
+const botStart = () => {
+  bot.setMyCommands([
+    { command: "/start", description: "Botni ishga tushirish" },
+    { command: "/game", description: "O'yin o'ynash" },
+  ]);
+
   bot.on("message", async msg => {
     const chatId = msg.chat.id;
     const text = msg.text;
+    const name = msg.from.first_name;
 
-    if (text === "/start") return bot.sendMessage(chatId, `Assalomu aleykum ${msg.chat.first_name}, botimizga xush kelibsiz!`);
+    if (text === "/start") return bot.sendMessage(chatId, `Assalomu aleykum ${name}, xush kelibsiz!`, startOptions);
     else if (text === "/game") return startGame(chatId);
-    else return bot.sendMessage(chatId, "Mavjud bo'lmagan buyruq!, /start buyrug'idan foydalaning");
+    else return bot.sendMessage(chatId, "Noma'lum buyruq!, /start dan foydalaning");
+  });
+
+  bot.on("callback_query", async msg => {
+    const chatId = msg.message.chat.id;
+    const data = msg.data;
+
+    if (data === "/game" || data === "/again") return startGame(chatId);
+    else if (+data === randomNum && !!randomNum)
+      return bot.sendMessage(chatId, `Siz yutdingiz! javob chindan ham ${data} edi✅`, restartOptions);
+    else if (+data !== randomNum && !!randomNum)
+      return bot.sendMessage(chatId, `Siz yutqazdingiz! aslida javob ${randomNum} edi🙂`, restartOptions);
   });
 };
 
-start();
-
-bot.on("callback_query", async msg => {
-  const chatId = msg.message.chat.id;
-  const data = msg.data;
-  if (data === "/again") return startGame(chatId);
-  else if (+data === chats.chatId && !!chats.chatId)
-    return bot.sendMessage(chatId, `Tabriklaymiz siz yutdingiz, javob chindan ham ${data} edi!✅👌`);
-  else return bot.sendMessage(chatId, `Yutqazdingiz! javob ${chats.chatId} edi!🙂`, againOptions);
-});
+botStart();
