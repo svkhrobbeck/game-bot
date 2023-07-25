@@ -49,7 +49,7 @@ const startGame = async chatId => {
 const botStart = () => {
   bot.setMyCommands([
     { command: "/start", description: "Botni ishga tushirish" },
-    { command: "/game", description: "O'yin o'ynash" },
+    { command: "/game", description: "O'yinni boshlash" },
   ]);
 
   bot.on("message", async msg => {
