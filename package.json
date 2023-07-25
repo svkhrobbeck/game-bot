@@ -1,5 +1,5 @@
 {
-  "name": "first-bot",
+  "name": "game-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,8 +7,12 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "NodeJS telegram bot",
+    "telegram bot",
+    "game bot"
+  ],
+  "author": "Suhrobbek Soatov",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.0.1"
